@@ -1,0 +1,65 @@
+import random
+
+
+def letter_index_finder(letter,word):
+    let_list = []
+    index = 0
+    while index < len(word):
+        index = word.find(letter,index)
+        if index == -1:
+            break
+        let_list.append(index)
+        index += 1 
+    return let_list
+
+def get_word_list_from_file(filename):
+    file = open(filename, "r")
+    wordList = []
+    for word in file.read().split():
+        wordList.append(word)
+    file.close()
+    return wordList
+
+wordlist_filename = "word_list.txt"
+
+try:
+    wordList = get_word_list_from_file(wordlist_filename)
+except FileNotFoundError:
+    print("The filename cannot be found or has been entered incorrectly")   
+else:
+    guessList = []
+    rand_word = random.choice(wordList)
+
+    chances = 7
+    hidden_word = list(len(rand_word) * ("*"))
+    print("Hello, welcome to Hangman!")
+    print(''.join(hidden_word))
+    while chances >0:
+        
+        if ''.join(hidden_word) == rand_word:
+            print("Congratulations, you win! ")
+            break
+        
+        player_guess = input("Please Enter your Next Guess \n")
+        while len(player_guess) >1:
+            print("You may only guess one letter at a time, so..")
+            player_guess = input("Please Enter your Next Guess \n")
+        guessed_letter_locations = letter_index_finder(player_guess,rand_word)
+        print(''.join(hidden_word))
+
+        if not guessed_letter_locations:
+            chances -= 1
+            guessList.append(player_guess)
+            print ("you have",(chances), "remaining")
+            print ("you have guessed",''.join(guessList))
+        
+        if len(guessed_letter_locations) == 1:
+            hidden_word[guessed_letter_locations[0]] = player_guess
+            print(''.join(hidden_word)) 
+        elif len(guessed_letter_locations) >1:
+            for letter_index in guessed_letter_locations:
+                hidden_word[letter_index] = player_guess
+            print(''.join(hidden_word))    
+                
+    if chances == 0:
+        print("You Lose!")
